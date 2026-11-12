@@ -13,7 +13,6 @@ function Login() {
 
   const handleLogin = async (event) => {
     event.preventDefault();
-
     setError("");
     setLoading(true);
 
@@ -23,29 +22,21 @@ function Login() {
         password,
       });
 
-      console.log("Login API response:", response.data);
-
       const token =
-        response.data?.access_token ||
-        response.data?.token;
+        response.data?.access_token || response.data?.token;
 
       if (!token) {
-        console.error("Token not found in response:", response.data);
         setError("Login response did not contain a token.");
         return;
       }
 
       localStorage.setItem("token", token);
-
-      console.log("Token saved successfully.");
-
       navigate("/dashboard", { replace: true });
-    } catch (err) {
-      console.error("Login error:", err);
 
+    } catch (err) {
       setError(
         err.response?.data?.detail ||
-          "Login failed. Please check your email and password."
+        "Login failed. Please check your credentials."
       );
     } finally {
       setLoading(false);
@@ -55,37 +46,49 @@ function Login() {
   return (
     <div className="auth-container">
       <form className="auth-form" onSubmit={handleLogin}>
-        <h2>FitTrack Login</h2>
+        <div className="auth-logo">💪</div>
+
+        <h1>FitTrack</h1>
+        <p className="auth-subtitle">
+          Your fitness journey starts here.
+        </p>
+
+        <h2>Welcome Back!</h2>
+        <p className="auth-description">
+          Sign in to continue your fitness journey.
+        </p>
 
         {error && (
-          <p className="error-message">
-            {error}
-          </p>
+          <p className="error-message">{String(error)}</p>
         )}
 
+        <label>Email Address</label>
         <input
           type="email"
-          placeholder="Email"
+          placeholder="Enter your email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
+          autoComplete="email"
           required
         />
 
+        <label>Password</label>
         <input
           type="password"
-          placeholder="Password"
+          placeholder="Enter your password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
+          autoComplete="current-password"
           required
         />
 
         <button type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Login"}
+          {loading ? "Signing in..." : "Login"}
         </button>
 
-        <p>
+        <p className="auth-footer">
           Don't have an account?{" "}
-          <Link to="/register">Register</Link>
+          <Link to="/register">Create Account</Link>
         </p>
       </form>
     </div>

@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import API from "../services/api";
@@ -12,62 +13,94 @@ function Register() {
   });
 
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setMessage("");
+    setLoading(true);
 
     try {
       await API.post("/auth/register", form);
-      setMessage("Registration successful!");
-      navigate("/login");
+      setMessage("Registration successful! Redirecting to login...");
+
+      setTimeout(() => navigate("/login"), 1200);
     } catch (error) {
-      setMessage(error.response?.data?.detail || "Registration failed");
+      setMessage(
+        error.response?.data?.detail || "Registration failed."
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="auth-container">
-      <form className="auth-card" onSubmit={handleSubmit}>
-        <h1>Join FitTrack</h1>
-        <p>Create your fitness account</p>
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <div className="auth-logo">💪</div>
 
+        <h1>FitTrack</h1>
+        <p className="auth-subtitle">
+          Start your fitness journey today.
+        </p>
+
+        <h2>Create Account</h2>
+        <p className="auth-description">
+          Join FitTrack and achieve your fitness goals.
+        </p>
+
+        <label>Username</label>
         <input
           name="username"
-          placeholder="Username"
+          type="text"
+          placeholder="Enter username"
           value={form.username}
           onChange={handleChange}
+          autoComplete="username"
           required
         />
 
+        <label>Email Address</label>
         <input
           name="email"
           type="email"
-          placeholder="Email"
+          placeholder="Enter email"
           value={form.email}
           onChange={handleChange}
+          autoComplete="email"
           required
         />
 
+        <label>Password</label>
         <input
           name="password"
           type="password"
-          placeholder="Password (minimum 8 characters)"
+          placeholder="Minimum 8 characters"
           value={form.password}
           onChange={handleChange}
-          required
+          autoComplete="new-password"
           minLength={8}
+          required
         />
 
-        <button type="submit">Register</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Creating Account..." : "Register"}
+        </button>
 
-        {message && <p>{message}</p>}
+        {message && (
+          <p className="auth-description">{message}</p>
+        )}
 
-        <p>
-          Already registered? <Link to="/login">Login</Link>
+        <p className="auth-footer">
+          Already have an account?{" "}
+          <Link to="/login">Login</Link>
         </p>
       </form>
     </div>
